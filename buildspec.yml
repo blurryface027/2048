@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com
+
+  build:
+    commands:
+      - echo Building Docker image...
+      - docker build -t aws-codepipeline-2048 .
+      - docker tag aws-codepipeline-2048:latest $ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/aws-codepipeline-2048:latest
+
+  post_build:
+    commands:
+      - echo Pushing image...
+      - docker push $ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/aws-codepipeline-2048:latest
+      - printf '[{"name":"2048","imageUri":"%s"}]' $ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/aws-codepipeline-2048:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
