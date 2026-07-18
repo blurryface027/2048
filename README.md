@@ -1,0 +1,1 @@
+This project uses the open-source 2048 game by Gabriele Cirulli (MIT License). The application source code is from the original repository, while the Dockerization, AWS infrastructure, CI/CD pipeline, and deployment automation were implemented by me.
